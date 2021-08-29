@@ -1,28 +1,26 @@
-#include "array_int.h"
+#include "array_char.h"
 #include<assert.h>
 #include<stdlib.h>
 
-int array_int_increase_capacity(array_int_t* array);
+int array_char_increase_capacity(array_char_t* array);
 
-int array_int_init(array_int_t* array){
+int array_char_init(array_char_t* array){
     assert(array);
     array->capacity = 0;
     array->count = 0;
-    array->elements = NULL;
-    array_char_init(&array->fact);
     return EXIT_SUCCESS;
 }
 
-void array_int_destroy(array_int_t* array){
+void array_char_destroy(array_char_t* array){
   assert(array);
   array->capacity = 0;
   array->count = 0;
   free(array->elements);
 }
-int array_int_append(array_int_t* array,int64_t element){
+int array_char_append(array_char_t* array,char element){
   assert(array);
   if(array->count == array->capacity){
-    if(array_int_increase_capacity(array) != EXIT_SUCCESS){
+    if(array_char_increase_capacity(array) != EXIT_SUCCESS){
       return EXIT_FAILURE;  
     }  
   }
@@ -30,10 +28,10 @@ int array_int_append(array_int_t* array,int64_t element){
   return EXIT_SUCCESS;
 }
 
-int array_int_increase_capacity(array_int_t* array){
+int array_char_increase_capacity(array_char_t* array){
   size_t new_capacity = 10 * (array->capacity ? array->capacity : 1);
-  int64_t* new_elements = (int64_t*) 
-    realloc(array->elements, new_capacity * sizeof(int64_t));  
+  char* new_elements = (char*) 
+    realloc(array->elements, new_capacity * sizeof(char));  
   if(new_elements){
     array->capacity = new_capacity;
     array->elements = new_elements;

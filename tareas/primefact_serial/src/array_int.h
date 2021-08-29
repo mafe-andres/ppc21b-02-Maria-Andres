@@ -2,11 +2,15 @@
 #define ARRAY_INT_H
 
 # include <stddef.h>
+# include <stdint.h>
+# include <array_char.h>
 
 typedef struct{
   size_t capacity;
   size_t count;
   int64_t* elements;  
+  array_char_t fact;
+
 }array_int_t;
 
 int array_int_init(array_int_t* array);
