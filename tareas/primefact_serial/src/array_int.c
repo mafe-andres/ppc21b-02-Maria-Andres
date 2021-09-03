@@ -1,44 +1,69 @@
+/*
+ * Copyright [2021] Maria Andres
+ */
 #include "array_int.h"
-#include<assert.h>
-#include<stdlib.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
+#include <math.h>
 
-int array_int_increase_capacity(array_int_t* array);
+int array_increase_capacity(array_int_t* a);
 
-int array_int_init(array_int_t* array){
-    assert(array);
-    array->capacity = 0;
-    array->count = 0;
-    array->elements = NULL;
-    array_char_init(&array->fact);
-    return EXIT_SUCCESS;
+/**
+ @brief Inicia el array
+ @param array_int
+ */
+void array_init(array_int_t* a) {
+  assert(a);
+  a->capacidad = 0;
+  a->contador = 0;
+  a->elementos = NULL;
 }
 
-void array_int_destroy(array_int_t* array){
-  assert(array);
-  array->capacity = 0;
-  array->count = 0;
-  free(array->elements);
+/**
+ @brief Libera el array
+ @param array_int
+ */
+void array_destroy(array_int_t* a) {
+  assert(a);
+  a->capacidad = 0;
+  a->contador = 0;
+  free(a->elementos);
 }
-int array_int_append(array_int_t* array,int64_t element){
-  assert(array);
-  if(array->count == array->capacity){
-    if(array_int_increase_capacity(array) != EXIT_SUCCESS){
-      return EXIT_FAILURE;  
-    }  
+
+/**
+ @brief Agrega un numero al array
+ @param array_int
+ @param int64_t
+ @return EXIT_FAILURE for fail, EXIT_SUCCESS for succes
+ */
+int array_append(array_int_t* a, int64_t elm) {
+  assert(a);
+  if (a->contador == a->capacidad) {
+    if (array_increase_capacity(a) != EXIT_SUCCESS) {
+      return EXIT_FAILURE;
+    }
   }
-  array->elements[array->count++]=element;
+  a->elementos[a->contador++] = elm;
   return EXIT_SUCCESS;
 }
 
-int array_int_increase_capacity(array_int_t* array){
-  size_t new_capacity = 10 * (array->capacity ? array->capacity : 1);
-  int64_t* new_elements = (int64_t*) 
-    realloc(array->elements, new_capacity * sizeof(int64_t));  
-  if(new_elements){
-    array->capacity = new_capacity;
-    array->elements = new_elements;
+/**
+  @brief Inrementa la capacidad el array
+  @param array_int
+  @return EXIT_FAILURE for fail, EXIT_SUCCESS for succes
+ */
+int array_increase_capacity(array_int_t* a) {
+  size_t new_capacidad = a->capacidad + 1;
+  int64_t* new_elementos = (int64_t*)
+    realloc(a->elementos, new_capacidad * sizeof(int64_t));
+  if (new_elementos) {
+    a->capacidad = new_capacidad;
+    a->elementos = new_elementos;
     return EXIT_SUCCESS;
-  }else{
+  } else {
     return EXIT_FAILURE;
   }
 }

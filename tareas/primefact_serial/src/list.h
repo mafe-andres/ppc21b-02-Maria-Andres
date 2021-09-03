@@ -1,3 +1,6 @@
+/*
+ * Copyright [2021] Maria Andres
+ */
 #ifndef LIST_H
 #define LIST_H
 
@@ -5,26 +8,38 @@
 #include <stdint.h>
 #include <array_int.h>
 
-struct node{
+/**
+ @struct node
+ @brief almacena enteros y sus factorizaciones
+ */
+struct node {
     int64_t num;
-    array_int_t primos;
-    array_int_t potencias;
+    /**< Almacena el entero*/
+    array_int_t *primos;
+    /**< Almacena las bases de la factorizacion*/
+    array_int_t *potencias;
+    /**< Almacena las potencias de la factorizacion*/
     struct node *next;
+    /**< Almacena el siguiente nodo*/
 };
 
 typedef struct node Node;
 
-struct list{
+/**
+ @struct list
+ @brief almacena un nodo, la cabeza de la lista
+ */
+struct list {
     Node *cabeza;
 };
 
 typedef struct list List;
 
-void list_init(List*);
-void list_insert_last(List*n, int64_t);
-int length(List*);
-void destroy(List*);
-void factorizar(List*);
-void imprimir(List*)
+void list_init(List* lista);
+void list_insert_last(List*lista, int64_t);
+int length(List* lista);
+void destroy(List* lista);
+void factorizar(List*lista);
+void imprimir(List* lista);
 
 #endif  // LIST_H
