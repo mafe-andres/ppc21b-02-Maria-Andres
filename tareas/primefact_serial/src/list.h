@@ -10,7 +10,7 @@
 
 /**
  @struct node
- @brief almacena enteros y sus factorizaciones
+ @brief stores interger and corresponding factorizations
  */
 struct node {
     int64_t num;
@@ -27,7 +27,7 @@ typedef struct node Node;
 
 /**
  @struct list
- @brief almacena un nodo, la cabeza de la lista
+ @brief stores a single node, the head of the list
  */
 struct list {
     Node *cabeza;

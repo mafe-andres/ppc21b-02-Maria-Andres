@@ -9,7 +9,7 @@
 #include "list.h"
 
 /**
- @brief Reads file, factorizes numbers and prints them
+ @brief Reads file, stores numbers in a list, calls factorization and print.
  @return 0
  */
 int main(void) {

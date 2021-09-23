@@ -19,7 +19,7 @@ void list_init(List *l) {
 }
 
 /**
- @brief Inserts node at the end of the list
+ @brief Inserts node at the end of the list. Runs through entire list and inserts node at the end of it
  @param List
  @param int64_t
  */
@@ -65,7 +65,7 @@ int length(List *lista) {
 }
 
 /**
- @brief Frees all nodes in list
+ @brief Frees all nodes and arrays inside nodes.
  @param List
  */
 void destroy(List *lista) {
@@ -87,7 +87,10 @@ void destroy(List *lista) {
 }
 
 /**
- @brief Factorizes every number in the list
+ @brief Factorizes every number in the list.
+        Runs through list, if n is not factorizable stores -1. If n
+        is factorizable checks if it is prime or not, if prime stores itself
+        if not calculates list of prime numbers and corresponding exponents.
  @param List
  */
 void factorizar(List *l) {
@@ -135,7 +138,9 @@ void factorizar(List *l) {
 }
 
 /**
- @brief Prints in console all numbers and respective factorizations
+ @brief Prints in console all numbers and respective factorizations.
+        Runs through the list, if it finds a negative number prints "invalid number",
+        else, prints primes and exponents.
  @param List
  */
 void imprimir(List *l) {

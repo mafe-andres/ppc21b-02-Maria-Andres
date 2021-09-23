@@ -8,7 +8,7 @@
 
 /**
  @struct array_int
- @brief almacena enteros
+ @brief Stores an array of intergers
  */
 typedef struct {
   size_t capacidad;
