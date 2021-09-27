@@ -105,7 +105,7 @@ void factorizar(List *l) {
                         contador++;
                         num /= j;
                         if (num%j != 0) {
-                            if (contador > 1) {
+                            if (contador > 1) {  // Non-prime
                                 if (num > 1) {
                                     array_append(ptr->primos, j);
                                     array_append(ptr->potencias, contador);
@@ -113,10 +113,7 @@ void factorizar(List *l) {
                                     array_append(ptr->primos, j);
                                     array_append(ptr->potencias, contador);
                                 }
-                            } else if (num > 1) {
-                                array_append(ptr->primos, j);
-                                array_append(ptr->potencias, 1);
-                            } else if (num == 1) {
+                            } else {  // Prime
                                 array_append(ptr->primos, j);
                                 array_append(ptr->potencias, 1);
                             }
@@ -124,7 +121,7 @@ void factorizar(List *l) {
                     }
                 }
             } else {
-                if (((num < 1) || (num == 1) || (num == 0)) && (num != -125)) {
+                if (((num < 1) || (num == 1) || (num == 0)) && (num != -1)) {
                     array_append(ptr->primos, -2);
                     array_append(ptr->potencias, -2);
                 } else {
