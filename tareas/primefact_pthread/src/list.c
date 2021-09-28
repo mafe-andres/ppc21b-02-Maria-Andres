@@ -14,8 +14,13 @@
  @brief Initializes list
  @param List
  */
-void list_init(List *l) {
+int list_init(List *l) {
+    int error = EXIT_SUCCESS;
     l->cabeza = 0;
+    if (l->cabeza!=0) {
+        error = EXIT_FAILURE;
+    }
+    return error;
 }
 
 /**
@@ -68,7 +73,7 @@ int length(List *lista) {
  @brief Frees all nodes and arrays inside nodes.
  @param List
  */
-void destroy(List *lista) {
+void list_destroy(List *lista) {
     Node *ptr1;
     Node *ptr2;
     if (lista->cabeza != 0) {

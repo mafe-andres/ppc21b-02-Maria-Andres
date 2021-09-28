@@ -35,10 +35,10 @@ struct list {
 
 typedef struct list List;
 
-void list_init(List* lista);
+int list_init(List* lista);
 void list_insert_last(List*lista, int64_t);
 int length(List* lista);
-void destroy(List* lista);
+void list_destroy(List* lista);
 void factorizar(List*lista);
 void imprimir(List* lista);
 
