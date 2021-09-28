@@ -1,0 +1,36 @@
+procedure main(argc, argv[])
+
+    shared thread_count := SYSTEM(CPUs)
+    if(argc > 1)
+        thread_count := integer(argv[1])
+
+    shared := lista
+    read_numbers(lista)
+    create_threads(thread_count)
+    imprimir()
+end procedure
+
+procedure create_threads(thread_count)
+  threads[thread_count]
+
+  for thread_number := 0 to thread_count do
+    threads[thread_number] := create_thread(factorizar, thread_number)
+  end for
+
+  for thread_number := 0 to thread_count do
+    join(threads[thread_number])
+  end for
+end procedure 
+
+procedure read_numbers(lista)
+    while (!lastline) do
+        addnumber()
+    end
+end procedure
+
+procedure factorizar(thread_number)
+    while (!lastitem) do
+        addbases()
+        addexponents()
+    end
+end procedure
