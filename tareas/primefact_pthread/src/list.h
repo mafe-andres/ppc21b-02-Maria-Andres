@@ -10,9 +10,9 @@
 
 /**
  @struct node
- @brief stores interger and corresponding factorizations
+ @brief almacena enteros y sus factorizaciones
  */
-struct node {
+typedef struct node {
     int64_t num;
     /**< Almacena el entero*/
     array_int_t *primos;
@@ -21,25 +21,23 @@ struct node {
     /**< Almacena las potencias de la factorizacion*/
     struct node *next;
     /**< Almacena el siguiente nodo*/
-};
-
-typedef struct node Node;
+} node_t;
 
 /**
  @struct list
- @brief stores a single node, the head of the list
+ @brief almacena un nodo, la cabeza de la lista
  */
-struct list {
-    Node *cabeza;
-};
+typedef struct list {
+    node_t *cabeza;
+} list_t;
 
-typedef struct list List;
 
-int list_init(List* lista);
-void list_insert_last(List*lista, int64_t);
-int length(List* lista);
-void list_destroy(List* lista);
-void factorizar(Node* ptr);
-void imprimir(List* lista);
+void list_init(list_t* lista);
+void list_destroy(list_t* lista);
+int list_length(list_t* lista);
+void list_insert_last(list_t*lista, int64_t);
+void list_factorizar(list_t*lista);
+void node_factorizar(node_t *ptr);
+void list_imprimir(list_t* lista);
 
 #endif  // LIST_H

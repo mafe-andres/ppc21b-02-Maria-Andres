@@ -5,36 +5,36 @@
 #include <inttypes.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 #include "list.h"
 
-// thread_shared_data_t
 typedef struct shared {
+  list_t list;
+  node_t *pos;
   uint64_t thread_count;
-  List list;
   pthread_mutex_t mutex;
-  Node node;
+
 } shared_data_t;
 
-// thread_private_data_t
 typedef struct private {
   uint64_t thread_number;
   shared_data_t* shared_data;
 } private_data_t;
 
+void* factorize_threads(void *data);
+int read_numbers(list_t *list);
+int create_threads(shared_data_t *shared_data);
 
-void* factorizar_threads(void* data);
-int read_numbers(shared_data_t* shared_data);
-int create_threads(shared_data_t* shared_data);
-
-// procedure main
+/**
+ @brief Reads file, factorizes numbers and prints them
+ @return 0
+ */
 int main(int argc, char* argv[]) {
-  int error = 0;
-
-  int64_t thread_count = sysconf(_SC_NPROCESSORS_ONLN);
+  int error = EXIT_SUCCESS;
+  uint64_t thread_count = sysconf(_SC_NPROCESSORS_ONLN);
   if (argc == 2) {
     if (sscanf(argv[1], "%" SCNu64, &thread_count) == 1) {
     } else {
@@ -43,15 +43,25 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  list_t list_temp;
+  list_init(&list_temp);
+  read_numbers(&list_temp);
+
   shared_data_t* shared_data = (shared_data_t*)calloc(1, sizeof(shared_data_t));
   if (shared_data) {
-    List list_temp;
-    list_init(&list_temp);
+
     shared_data->list = list_temp;
-    list_destroy(&list_temp);
+    shared_data->pos = shared_data->list.cabeza;
     shared_data->thread_count = thread_count;
 
-    error = create_threads(shared_data);
+    if (list_length(&shared_data->list)!=0) {
+      create_threads(shared_data);
+      list_imprimir(&shared_data->list);
+      list_destroy(&shared_data->list);
+    } else {
+      fprintf(stderr, "Error: could not create list\n");
+      error = 12;
+    }
     free(shared_data);
   } else {
     fprintf(stderr, "error: could not allocate shared memory\n");
@@ -60,46 +70,39 @@ int main(int argc, char* argv[]) {
   return error;
 }
 
-int read_numbers(shared_data_t* shared_data) {
+int read_numbers(list_t *list){
+  int error = EXIT_FAILURE;
   int64_t num;
-  int last = -1;
+  int64_t last = -1;
   char *prueba = malloc(100);
   int final = 0;
-  while ((scanf("%"SCNd64, &num) == 1 || (final = scanf("%s", prueba)) == 1)) {
+  while (scanf("%"SCNd64, &num) == 1 || (final = scanf("%s", prueba)) == 1) {
     if (final == 1) {
-      list_insert_last(&shared_data->list, last);
+      list_insert_last(list, last);
       final = 0;
     } else {
-      list_insert_last(&shared_data->list, num);
+      list_insert_last(list, num);
     }
   }
   free(prueba);
-  return EXIT_SUCCESS;
-}
-
-void* factorizar_threads(void* data){
-    private_data_t* private_data = (private_data_t*) data;
-    shared_data_t* shared_data = private_data->shared_data;
-    Node *ptr = shared_data->list.cabeza;
-    return NULL;
+  if(list){
+    error = EXIT_SUCCESS;
+  }
+  return error;
 }
 
 int create_threads(shared_data_t* shared_data) {
   int error = EXIT_SUCCESS;
-  // create_thread(greet)
   pthread_t* threads = (pthread_t*)
     malloc(shared_data->thread_count * sizeof(pthread_t));
   private_data_t* private_data = (private_data_t*)
     calloc(shared_data->thread_count, sizeof(private_data_t));
   if (threads && private_data) {
-    // for thread_number := 0 to thread_count do
     for (uint64_t thread_number = 0; thread_number < shared_data->thread_count
         ; ++thread_number) {
       private_data[thread_number].thread_number = thread_number;
       private_data[thread_number].shared_data = shared_data;
-      // create_thread(greet, thread_number)
-          
-      error = pthread_create(&threads[thread_number], /*attr*/ NULL, factorizar_threads
+      error = pthread_create(&threads[thread_number], /*attr*/ NULL, factorize_threads
         , /*arg*/ &private_data[thread_number]);
       if (error == EXIT_SUCCESS) {
       } else { 
@@ -123,3 +126,21 @@ int create_threads(shared_data_t* shared_data) {
   return error;
 }
 
+void* factorize_threads(void* data){
+    private_data_t* private_data = (private_data_t*) data;
+    shared_data_t* shared_data = private_data->shared_data;
+    node_t *ptr; 
+    while (true){
+      pthread_mutex_lock(&shared_data->mutex);
+        if(shared_data->pos==NULL){
+          pthread_mutex_unlock(&shared_data->mutex);
+          break;
+        }
+        ptr = shared_data->pos;
+        shared_data->pos = ptr->next;
+      pthread_mutex_unlock(&shared_data->mutex);
+      node_factorizar(ptr);
+    }
+    
+    return NULL;
+}

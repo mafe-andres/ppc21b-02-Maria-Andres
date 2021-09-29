@@ -12,7 +12,7 @@
 int array_increase_capacity(array_int_t* a);
 
 /**
- @brief Initializes array
+ @brief Inicia el array
  @param array_int
  */
 void array_init(array_int_t* a) {
@@ -23,7 +23,7 @@ void array_init(array_int_t* a) {
 }
 
 /**
- @brief Frees the array
+ @brief Libera el array
  @param array_int
  */
 void array_destroy(array_int_t* a) {
@@ -34,7 +34,7 @@ void array_destroy(array_int_t* a) {
 }
 
 /**
- @brief Adds a number to the array
+ @brief Agrega un numero al array
  @param array_int
  @param int64_t
  @return EXIT_FAILURE for fail, EXIT_SUCCESS for succes
@@ -51,7 +51,7 @@ int array_append(array_int_t* a, int64_t elm) {
 }
 
 /**
-  @brief Increases array capacity
+  @brief Inrementa la capacidad el array
   @param array_int
   @return EXIT_FAILURE for fail, EXIT_SUCCESS for succes
  */

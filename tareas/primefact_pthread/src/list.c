@@ -14,24 +14,19 @@
  @brief Initializes list
  @param List
  */
-int list_init(List *l) {
-    int error = EXIT_SUCCESS;
+void list_init(list_t *l) {
     l->cabeza = 0;
-    if (l->cabeza!=0) {
-        error = EXIT_FAILURE;
-    }
-    return error;
 }
 
 /**
- @brief Inserts node at the end of the list. Runs through entire list and inserts node at the end of it
+ @brief Inserts node at the end of the list
  @param List
  @param int64_t
  */
-void list_insert_last(List *lista, int64_t num) {
-    Node *ptr;
-    Node *nuevo;
-    nuevo = (Node *)malloc(sizeof(Node));
+void list_insert_last(list_t *lista, int64_t num) {
+    node_t *ptr;
+    node_t *nuevo;
+    nuevo = (node_t *)malloc(sizeof(node_t));
     nuevo->num = num;
     nuevo->next = 0;
     nuevo->primos = (array_int_t *)malloc(sizeof(array_int_t));
@@ -50,32 +45,12 @@ void list_insert_last(List *lista, int64_t num) {
 }
 
 /**
- @brief Counts nodes in list
- @param List
- @return int
- */
-int length(List *lista) {
-    Node *ptr;
-    int count = 1;
-    if (lista->cabeza == 0) {
-        count = 1;
-    } else {
-        ptr = lista->cabeza;
-        while (ptr->next) {
-            ptr = ptr->next;
-            count++;
-        }
-    }
-    return count;
-}
-
-/**
- @brief Frees all nodes and arrays inside nodes.
+ @brief Frees all nodes in list
  @param List
  */
-void list_destroy(List *lista) {
-    Node *ptr1;
-    Node *ptr2;
+void list_destroy(list_t *lista) {
+    node_t *ptr1;
+    node_t *ptr2;
     if (lista->cabeza != 0) {
         ptr1 = lista->cabeza;
         while (ptr1) {
@@ -92,16 +67,33 @@ void list_destroy(List *lista) {
 }
 
 /**
- @brief Factorizes every number in the list.
-        Runs through list, if n is not factorizable stores -1. If n
-        is factorizable checks if it is prime or not, if prime stores itself
-        if not calculates list of prime numbers and corresponding exponents.
+ @brief Counts nodes in list
+ @param List
+ @return int
+ */
+int list_length(list_t *lista) {
+    node_t *ptr;
+    int count = 1;
+    if (lista->cabeza == 0) {
+        count = 1;
+    } else {
+        ptr = lista->cabeza;
+        while (ptr->next) {
+            ptr = ptr->next;
+            count++;
+        }
+    }
+    return count;
+}
+
+/**
+ @brief Factorizes every number in the list
  @param List
  */
-void factorizar(Node *ptr) {
-    // Node *ptr = l->cabeza;
-    // if (l->cabeza != 0) {
-    //     while (ptr) {
+void list_factorizar(list_t *l) {
+    node_t *ptr = l->cabeza;
+    if (l->cabeza != 0) {
+        while (ptr) {
             int64_t num = ptr->num;
             if (num > 1 && num < (pow(2, 63)-1)) {
                 for (int64_t j = 2; num > 1; j++) {
@@ -110,15 +102,10 @@ void factorizar(Node *ptr) {
                         contador++;
                         num /= j;
                         if (num%j != 0) {
-                            if (contador > 1) {  // Non-prime
-                                if (num > 1) {
-                                    array_append(ptr->primos, j);
-                                    array_append(ptr->potencias, contador);
-                                } else {
-                                    array_append(ptr->primos, j);
-                                    array_append(ptr->potencias, contador);
-                                }
-                            } else {  // Prime
+                            if (contador > 1) {
+                                array_append(ptr->primos, j);
+                                array_append(ptr->potencias, contador);
+                            } else {
                                 array_append(ptr->primos, j);
                                 array_append(ptr->potencias, 1);
                             }
@@ -134,19 +121,47 @@ void factorizar(Node *ptr) {
                     array_append(ptr->potencias, -1);
                 }
             }
-    //         ptr = ptr->next;
-    //     }
-    // }
+            ptr = ptr->next;
+        }
+    }
+}
+
+void node_factorizar(node_t *ptr) {
+    int64_t num = ptr->num;
+    if (num > 1 && num < (pow(2, 63)-1)) {
+        for (int64_t j = 2; num > 1; j++) {
+        int64_t contador = 0;
+            while (num%j == 0) {
+                contador++;
+                num /= j;
+                if (num%j != 0) {
+                    if (contador > 1) {
+                        array_append(ptr->primos, j);
+                        array_append(ptr->potencias, contador);
+                    } else {
+                        array_append(ptr->primos, j);
+                        array_append(ptr->potencias, 1);
+                    }
+                }
+            }
+        }
+    } else {
+        if (((num < 1) || (num == 1) || (num == 0)) && (num != -1)) {
+            array_append(ptr->primos, -2);
+            array_append(ptr->potencias, -2);
+        } else {
+            array_append(ptr->primos, -1);
+            array_append(ptr->potencias, -1);
+        }
+    }
 }
 
 /**
- @brief Prints in console all numbers and respective factorizations.
-        Runs through the list, if it finds a negative number prints "invalid number",
-        else, prints primes and exponents.
+ @brief Prints in console all numbers and respective factorizations
  @param List
  */
-void imprimir(List *l) {
-    Node *ptr = l->cabeza;
+void list_imprimir(list_t *l) {
+    node_t *ptr = l->cabeza;
     while (ptr) {
         if ((ptr->num == 0) || (ptr->num == 1)) {
             printf("%"PRId64": NA", ptr->num);
