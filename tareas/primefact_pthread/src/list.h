@@ -39,7 +39,7 @@ int list_init(List* lista);
 void list_insert_last(List*lista, int64_t);
 int length(List* lista);
 void list_destroy(List* lista);
-void factorizar(List*lista);
+void factorizar(Node* ptr);
 void imprimir(List* lista);
 
 #endif  // LIST_H

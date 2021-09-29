@@ -98,10 +98,10 @@ void list_destroy(List *lista) {
         if not calculates list of prime numbers and corresponding exponents.
  @param List
  */
-void factorizar(List *l) {
-    Node *ptr = l->cabeza;
-    if (l->cabeza != 0) {
-        while (ptr) {
+void factorizar(Node *ptr) {
+    // Node *ptr = l->cabeza;
+    // if (l->cabeza != 0) {
+    //     while (ptr) {
             int64_t num = ptr->num;
             if (num > 1 && num < (pow(2, 63)-1)) {
                 for (int64_t j = 2; num > 1; j++) {
@@ -134,9 +134,9 @@ void factorizar(List *l) {
                     array_append(ptr->potencias, -1);
                 }
             }
-            ptr = ptr->next;
-        }
-    }
+    //         ptr = ptr->next;
+    //     }
+    // }
 }
 
 /**
