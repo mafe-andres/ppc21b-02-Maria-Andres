@@ -16,7 +16,6 @@ typedef struct shared {
   node_t *pos;
   uint64_t thread_count;
   pthread_mutex_t mutex;
-
 } shared_data_t;
 
 typedef struct private {
@@ -49,12 +48,10 @@ int main(int argc, char* argv[]) {
 
   shared_data_t* shared_data = (shared_data_t*)calloc(1, sizeof(shared_data_t));
   if (shared_data) {
-
     shared_data->list = list_temp;
     shared_data->pos = shared_data->list.cabeza;
     shared_data->thread_count = thread_count;
-
-    if (list_length(&shared_data->list)!=0) {
+    if (list_length(&shared_data->list) != 0) {
       create_threads(shared_data);
       list_imprimir(&shared_data->list);
       list_destroy(&shared_data->list);
@@ -70,7 +67,7 @@ int main(int argc, char* argv[]) {
   return error;
 }
 
-int read_numbers(list_t *list){
+int read_numbers(list_t *list) {
   int error = EXIT_FAILURE;
   int64_t num;
   int64_t last = -1;
@@ -85,7 +82,7 @@ int read_numbers(list_t *list){
     }
   }
   free(prueba);
-  if(list){
+  if (list) {
     error = EXIT_SUCCESS;
   }
   return error;
@@ -102,10 +99,10 @@ int create_threads(shared_data_t* shared_data) {
         ; ++thread_number) {
       private_data[thread_number].thread_number = thread_number;
       private_data[thread_number].shared_data = shared_data;
-      error = pthread_create(&threads[thread_number], /*attr*/ NULL, factorize_threads
+      error = pthread_create(&threads[thread_number], NULL, factorize_threads
         , /*arg*/ &private_data[thread_number]);
       if (error == EXIT_SUCCESS) {
-      } else { 
+      } else {
         fprintf(stderr, "Error: could not create secondary thread\n");
         error = 22;
         break;
@@ -126,13 +123,13 @@ int create_threads(shared_data_t* shared_data) {
   return error;
 }
 
-void* factorize_threads(void* data){
+void* factorize_threads(void* data) {
     private_data_t* private_data = (private_data_t*) data;
     shared_data_t* shared_data = private_data->shared_data;
-    node_t *ptr; 
-    while (true){
+    node_t *ptr;
+    while (true) {
       pthread_mutex_lock(&shared_data->mutex);
-        if(shared_data->pos==NULL){
+        if (shared_data->pos == NULL) {
           pthread_mutex_unlock(&shared_data->mutex);
           break;
         }
@@ -141,6 +138,5 @@ void* factorize_threads(void* data){
       pthread_mutex_unlock(&shared_data->mutex);
       node_factorizar(ptr);
     }
-    
     return NULL;
 }

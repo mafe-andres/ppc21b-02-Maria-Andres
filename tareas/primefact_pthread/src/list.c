@@ -1,12 +1,13 @@
 /*
  * Copyright [2021] Maria Andres
  */
-#include "list.h"
+
 #include <inttypes.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <array_int.h>
+#include "list.h"
 
 // Lista adaptada de <http://www1.cs.columbia.edu/~aya/W3101-01/lectures/linked-list.pdf>
 
