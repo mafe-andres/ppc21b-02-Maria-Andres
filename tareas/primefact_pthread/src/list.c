@@ -13,15 +13,15 @@
 
 /**
  @brief Initializes list
- @param List
+ @param list_t
  */
 void list_init(list_t *l) {
     l->cabeza = 0;
 }
 
 /**
- @brief Inserts node at the end of the list
- @param List
+ @brief Inserts node at the end of the list. Runs through entire list and inserts node at the end of it
+ @param list_t
  @param int64_t
  */
 void list_insert_last(list_t *lista, int64_t num) {
@@ -46,8 +46,8 @@ void list_insert_last(list_t *lista, int64_t num) {
 }
 
 /**
- @brief Frees all nodes in list
- @param List
+ @brief Frees all nodes and arrays inside nodes.
+ @param list_t
  */
 void list_destroy(list_t *lista) {
     node_t *ptr1;
@@ -69,7 +69,7 @@ void list_destroy(list_t *lista) {
 
 /**
  @brief Counts nodes in list
- @param List
+ @param list_t
  @return int
  */
 int list_length(list_t *lista) {
@@ -88,8 +88,11 @@ int list_length(list_t *lista) {
 }
 
 /**
- @brief Factorizes every number in the list
- @param List
+ @brief Factorizes every number in the list.
+        Runs through list, if n is not factorizable stores -1. If n
+        is factorizable checks if it is prime or not, if prime stores itself
+        if not calculates list of prime numbers and corresponding exponents.
+ @param list_t
  */
 void list_factorizar(list_t *l) {
     node_t *ptr = l->cabeza;
@@ -127,6 +130,12 @@ void list_factorizar(list_t *l) {
     }
 }
 
+/**
+ @brief Recieves a pointer to a node and get number. if n is not factorizable stores -1. 
+        If n is factorizable checks if it is prime or not, if prime stores itself
+        if not calculates list of prime numbers and corresponding exponents.
+ @param list_t
+ */
 void node_factorizar(node_t *ptr) {
     int64_t num = ptr->num;
     if (num > 1 && num < (pow(2, 63)-1)) {
@@ -158,8 +167,10 @@ void node_factorizar(node_t *ptr) {
 }
 
 /**
- @brief Prints in console all numbers and respective factorizations
- @param List
+ @brief Prints in console all numbers and respective factorizations.
+        Runs through the list, if it finds a negative number prints "invalid number",
+        else, prints primes and exponents.
+ @param list_t
  */
 void list_imprimir(list_t *l) {
     node_t *ptr = l->cabeza;

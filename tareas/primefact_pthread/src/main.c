@@ -11,16 +11,30 @@
 #include <unistd.h>
 #include "list.h"
 
+/**
+ @struct Shared_data
+ @brief Stores the list, the position in the list, amount of threads and mutex
+ */
 typedef struct shared {
   list_t list;
+  /**< Stores a list*/
   node_t *pos;
+  /**< Stores a node, the position*/
   uint64_t thread_count;
+  /**< Stores amount of threads*/
   pthread_mutex_t mutex;
+  /**< Stores mutex*/
 } shared_data_t;
 
+/**
+ @struct Private_data
+ @brief Stores the thread_number and a pointer to the shared data
+ */
 typedef struct private {
   uint64_t thread_number;
+  /**< Stores the particular thread number*/
   shared_data_t* shared_data;
+    /**< Stores a pointer to shared data*/
 } private_data_t;
 
 void* factorize_threads(void *data);
@@ -28,8 +42,8 @@ int read_numbers(list_t *list);
 int create_threads(shared_data_t *shared_data);
 
 /**
- @brief Reads file, factorizes numbers and prints them
- @return 0
+ @brief Reads amount of thread. Calls on readnumbers and create threads.
+ @return EXIT_SUCCESS if succesfull, error code if error found
  */
 int main(int argc, char* argv[]) {
   int error = EXIT_SUCCESS;
@@ -67,6 +81,11 @@ int main(int argc, char* argv[]) {
   return error;
 }
 
+/**
+ @brief Reads numbers from file and adds the to list
+ @param list_t
+ @return EXIT_SUCCESS if numbers added succesfully, EXIT_FAILURE if error
+ */
 int read_numbers(list_t *list) {
   int error = EXIT_FAILURE;
   int64_t num;
@@ -88,6 +107,11 @@ int read_numbers(list_t *list) {
   return error;
 }
 
+/**
+ @brief Creates and joins threads 
+ @param shared_data_t
+ @return EXIT_SUCCESS if threads finish succesfully, EXIT_FAILURE if error
+ */
 int create_threads(shared_data_t* shared_data) {
   int error = EXIT_SUCCESS;
   pthread_t* threads = (pthread_t*)
@@ -123,6 +147,11 @@ int create_threads(shared_data_t* shared_data) {
   return error;
 }
 
+/**
+ @brief Sends every number on list to factorize, mutex controls that no numbers are repeated or overwritten 
+ @param void pointer data
+ @return NULL
+ */
 void* factorize_threads(void* data) {
     private_data_t* private_data = (private_data_t*) data;
     shared_data_t* shared_data = private_data->shared_data;
