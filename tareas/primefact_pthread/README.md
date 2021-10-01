@@ -13,6 +13,10 @@ Para correr el programa se debe usar al ejecutable en la carpeta bin e introduci
 ```bash
 ./bin/primefact_serial < tests/input000.txt
 ```
+También se puede utilizar la opción de make para correr todos los tests:
+```bash
+make test
+```
 ## Créditos
 María Fernanda Andrés Monge
 maria.andres@ucr.ac.cr
