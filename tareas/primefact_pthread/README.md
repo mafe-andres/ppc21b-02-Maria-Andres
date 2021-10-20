@@ -2,7 +2,7 @@
 
 Factorizar números en sus componentes primos es una tarea larga. Todo número entero positivo no primo se puede dividir en una suma de numeros primos.  Por ejemplo, el número 10 se puede representar como 2 x 5, el número 100 como 2 x 2 x 5 x 5 o como 2^2 x 5^2 usando notación de potencias. Los numeros primos no se pueden factorizar. 
 
-Este programa usa la tecnología *pthreads* para repartir el trabajo. Cada *thread* factoriza un número de manera paralela. [Diseño.](/design/)
+Este programa usa la tecnología *pthreads* para repartir el trabajo. Cada *thread* factoriza un número de manera paralela. [Diseño.](/tareas/primefact_pthread/design/)
 
 ## Manual de Usuario
 
