@@ -28,9 +28,11 @@ procedure read_numbers(lista)
     end
 end procedure
 
-procedure factorizar(thread_number)
+procedure dynamic_mapping(thread_number)
     while (!lastitem) do
-        addbases()
-        addexponents()
+        factorizar()
+        mutex_lock()
+         nextitem
+        mutex_unlock()
     end
 end procedure
