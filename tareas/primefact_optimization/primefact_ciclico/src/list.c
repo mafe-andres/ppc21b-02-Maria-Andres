@@ -72,9 +72,9 @@ void list_destroy(list_t *lista) {
  @param list_t
  @return int
  */
-int list_length(list_t *lista) {
+int64_t list_length(list_t *lista) {
     node_t *ptr;
-    int count = 1;
+    int64_t count = 1;
     if (lista->cabeza == 0) {
         count = 1;
     } else {
@@ -85,6 +85,22 @@ int list_length(list_t *lista) {
         }
     }
     return count;
+}
+
+node_t* list_get_element(list_t *lista, uint64_t num){
+    node_t *ptr;
+    uint64_t counter = 0;
+    int found = 0;
+    ptr = lista->cabeza;
+    while (ptr != NULL && found == 0) {
+        if (counter == num) {
+            found = 1;
+        } else {
+            ptr = ptr->next;
+            counter++;
+        }
+    }
+    return ptr;
 }
 
 /**

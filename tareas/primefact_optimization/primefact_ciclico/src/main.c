@@ -18,12 +18,8 @@
 typedef struct shared {
   list_t list;
   /**< Stores a list*/
-  node_t *pos;
-  /**< Stores a node, the position*/
   uint64_t thread_count;
   /**< Stores amount of threads*/
-  pthread_mutex_t mutex;
-  /**< Stores mutex*/
 } shared_data_t;
 
 /**
@@ -59,11 +55,9 @@ int main(int argc, char* argv[]) {
   list_t list_temp;
   list_init(&list_temp);
   read_numbers(&list_temp);
-
   shared_data_t* shared_data = (shared_data_t*)calloc(1, sizeof(shared_data_t));
   if (shared_data) {
     shared_data->list = list_temp;
-    shared_data->pos = shared_data->list.cabeza;
     shared_data->thread_count = thread_count;
     if (list_length(&shared_data->list) != 0) {
       create_threads(shared_data);
@@ -155,17 +149,10 @@ int create_threads(shared_data_t* shared_data) {
 void* factorize_threads(void* data) {
     private_data_t* private_data = (private_data_t*) data;
     shared_data_t* shared_data = private_data->shared_data;
-    node_t *ptr;
-    while (true) {
-      pthread_mutex_lock(&shared_data->mutex);
-        if (shared_data->pos == NULL) {
-          pthread_mutex_unlock(&shared_data->mutex);
-          break;
-        }
-        ptr = shared_data->pos;
-        shared_data->pos = ptr->next;
-      pthread_mutex_unlock(&shared_data->mutex);
-      node_factorizar(ptr);
+    int64_t pos = private_data->thread_number;
+    while (pos<list_length(&shared_data->list)) {
+      node_factorizar(list_get_element(&shared_data->list,pos));
+      pos = pos + shared_data->thread_count;
     }
     return NULL;
 }

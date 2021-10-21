@@ -34,7 +34,8 @@ typedef struct list {
 
 void list_init(list_t* lista);
 void list_destroy(list_t* lista);
-int list_length(list_t* lista);
+int64_t list_length(list_t* lista);
+node_t* list_get_element(list_t *lista, uint64_t num);
 void list_insert_last(list_t*lista, int64_t);
 void list_factorizar(list_t*lista);
 void node_factorizar(node_t *ptr);
