@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 #include "list.h"
 
 /**
@@ -31,6 +32,8 @@ typedef struct private {
   /**< Stores the particular thread number*/
   shared_data_t* shared_data;
     /**< Stores a pointer to shared data*/
+  int64_t from;
+  int64_t to;
 } private_data_t;
 
 void* factorize_threads(void *data);
@@ -101,6 +104,18 @@ int read_numbers(list_t *list) {
   return error;
 }
 
+int64_t block(int64_t thread_number, shared_data_t* shared_data){
+    int64_t numperblock = (int64_t) round((double)list_length(&shared_data->list)/shared_data->thread_count);
+    int64_t from = thread_number*numperblock;
+    if (from > list_length(&shared_data->list)) {
+      from = list_length(&shared_data->list);
+    }
+    if (list_length(&shared_data->list) == 1 && thread_number == 1) {
+      from = 1;
+    }
+    return from;
+}
+
 /**
  @brief Creates and joins threads 
  @param shared_data_t
@@ -117,6 +132,8 @@ int create_threads(shared_data_t* shared_data) {
         ; ++thread_number) {
       private_data[thread_number].thread_number = thread_number;
       private_data[thread_number].shared_data = shared_data;
+      private_data[thread_number].from = block(thread_number, shared_data);
+      private_data[thread_number].to = block(thread_number+1, shared_data);
       error = pthread_create(&threads[thread_number], NULL, factorize_threads
         , /*arg*/ &private_data[thread_number]);
       if (error == EXIT_SUCCESS) {
