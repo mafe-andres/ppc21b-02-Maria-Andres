@@ -87,7 +87,7 @@ int64_t list_length(list_t *lista) {
     return count;
 }
 
-node_t* list_get_element(list_t *lista, uint64_t num){
+node_t* list_get_element(list_t *lista, uint64_t num) {
     node_t *ptr;
     uint64_t counter = 0;
     int found = 0;

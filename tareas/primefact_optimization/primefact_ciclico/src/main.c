@@ -150,8 +150,8 @@ void* factorize_threads(void* data) {
     private_data_t* private_data = (private_data_t*) data;
     shared_data_t* shared_data = private_data->shared_data;
     int64_t pos = private_data->thread_number;
-    while (pos<list_length(&shared_data->list)) {
-      node_factorizar(list_get_element(&shared_data->list,pos));
+    while (pos < list_length(&shared_data->list)) {
+      node_factorizar(list_get_element(&shared_data->list, pos));
       pos = pos + shared_data->thread_count;
     }
     return NULL;

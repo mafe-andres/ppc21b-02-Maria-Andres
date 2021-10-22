@@ -104,8 +104,9 @@ int read_numbers(list_t *list) {
   return error;
 }
 
-int64_t block(int64_t thread_number, shared_data_t* shared_data){
-    int64_t numperblock = (int64_t) round((double)list_length(&shared_data->list)/shared_data->thread_count);
+int64_t block(int64_t thread_number, shared_data_t* shared_data) {
+    int64_t numperblock = (int64_t)round((double)
+      list_length(&shared_data->list)/shared_data->thread_count);
     int64_t from = thread_number*numperblock;
     if (from > list_length(&shared_data->list)) {
       from = list_length(&shared_data->list);
@@ -167,8 +168,8 @@ void* factorize_threads(void* data) {
     private_data_t* private_data = (private_data_t*) data;
     shared_data_t* shared_data = private_data->shared_data;
     int64_t pos = private_data->thread_number;
-    while (pos<list_length(&shared_data->list)) {
-      node_factorizar(list_get_element(&shared_data->list,pos));
+    while (pos < list_length(&shared_data->list)) {
+      node_factorizar(list_get_element(&shared_data->list, pos));
       pos = pos + shared_data->thread_count;
     }
     return NULL;
