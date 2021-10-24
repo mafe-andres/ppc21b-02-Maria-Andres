@@ -140,9 +140,9 @@ void node_factorizar(node_t *ptr) {
     int64_t num = ptr->num;
     if (num > 1 && num < (pow(2, 63)-1)) {
         int64_t base = 2;
-        do{
+        do {
             int64_t contador = 0;
-            while ((num%base)==0) {
+            while ((num%base) == 0) {
                 contador++;
                 num /= base;
                 if ((num%base) != 0) {
@@ -155,11 +155,11 @@ void node_factorizar(node_t *ptr) {
                     }
                 }
             }
-            if (base==2){
-                base =1;
+            if (base == 2) {
+                base = 1;
             }
-            base=base+2;
-            } while(num >1);
+            base = base+2;
+            } while (num >1);
     } else {
         if (((num < 1) || (num == 1) || (num == 0)) && (num != -1)) {
             array_append(ptr->primos, -2);
