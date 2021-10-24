@@ -119,6 +119,7 @@ void list_factorizar(list_t *l) {
                 for (int64_t j = 2; num > 1; j++) {
                 int64_t contador = 0;
                     while (num%j == 0) {
+                    //while (reduce(num,j)==0){
                         contador++;
                         num /= j;
                         if (num%j != 0) {

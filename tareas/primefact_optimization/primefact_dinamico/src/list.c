@@ -139,22 +139,27 @@ void list_factorizar(list_t *l) {
 void node_factorizar(node_t *ptr) {
     int64_t num = ptr->num;
     if (num > 1 && num < (pow(2, 63)-1)) {
-        for (int64_t j = 2; num > 1; j++) {
-        int64_t contador = 0;
-            while (num%j == 0) {
+        int64_t base = 2;
+        do{
+            int64_t contador = 0;
+            while ((num%base)==0) {
                 contador++;
-                num /= j;
-                if (num%j != 0) {
+                num /= base;
+                if ((num%base) != 0) {
                     if (contador > 1) {
-                        array_append(ptr->primos, j);
+                        array_append(ptr->primos, base);
                         array_append(ptr->potencias, contador);
-                    } else {
-                        array_append(ptr->primos, j);
+                    } else if (num >= 1) {
+                        array_append(ptr->primos, base);
                         array_append(ptr->potencias, 1);
                     }
                 }
             }
-        }
+            if (base==2){
+                base =1;
+            }
+            base=base+2;
+            } while(num >1);
     } else {
         if (((num < 1) || (num == 1) || (num == 0)) && (num != -1)) {
             array_append(ptr->primos, -2);
