@@ -2,6 +2,7 @@
 _Para todos los valores en este reporte se tomó la menos de tres mediciones. Todas las mediciones se realizaron en una computadora con ocho CPUs_
 ### Optimización #1
 Como ya se había realizado el mapeo dinámico en la tarea 2, se optó por realizar un mapeo por bloque y uno cíclico. Esto con el fin de poder comparar el incremento en desempeño que proporciona el mapeo dinámico realizado en la tarea 1. Por esta razón se tomaron como punto de inicio las mediciones del programa en su versión serial. 
+
 A continuación las mediciones de estos tres mapeos:
 |   |Serial|Bloque|Cíclico|Dinámico|
 |:-:|:-:|:-:|---|---|
@@ -12,12 +13,23 @@ A continuación las mediciones de estos tres mapeos:
 Al ser el punto de partida el programa serial vemos que este tiene un speedup y una eficiencia de 1.00. El mapeo cíclico y el mapeo por bloque tuvieron resultados muy similares, por lo tanto no hay incremento ni de eficiencia ni desempeño. Sin embargo, como era de esperar el mapeo dinámico presenta una duración de casi la mitad con respecto a los otros dos mapeos.
 
 ### Optimización #2
+Paso 1: Medir rendimiento.
+|Dinámico|
+|:-:|
+|360.12|
+|3.27|
+|0.41|
+
+Paso 2: Profiling
 Partiendo del mapeo dinámico de la parte anterior se realizó el proceso de profiling. Por medio de las herramientas de callgrind y kcachegrind se pudieron visualizar las areas de mayor consumo: 
 ![most_called_function.png](most_called_function.png)
 ![sourcecode_nodefactorizar.png](sourcecode_nodefactorizar.png)
 Como se puede ver el método que más consume es el método de factorización por lo tanto se puso un enfásis en mejorar el rendimiento de este. 
 
-Después de una investigación de como optimizar el método de factorización se ideo una solución que solo prueba los numeros impares y el 2, pues solo los numeros impares pueden ser primos. Con unos cuantos cambios a los ciclos del metodo para factorizar se consiguió un programa funcional y más rápido. 
+Paso 3 y 4: Modificaciones y Pruebas
+Después de una investigación de como optimizar el método de factorización se ideo una solución que solo prueba los numeros impares y el 2, pues solo los numeros impares pueden ser primos. Con unos cuantos cambios a los ciclos del metodo para factorizar se consiguió un programa funcional.
+
+Paso 5: Rendimiento Optimizacion.
 A continuación las mediciones de la optmización realizada:
 |   |Serial|Dinámico|Optimización|
 |:-:|---|---|---|
@@ -26,6 +38,9 @@ A continuación las mediciones de la optmización realizada:
 |Eficiencia|1.00|0.41|0.75|
 
 Con estos datos no queda duda de que la solución implementada es una mejora significativa sobre solamente el mapeo dinámico.
+
+Paso 6: Documentar.
+A continuacion mas detalles del rendimiento.
 
 ### Comparación de Optimizaciones
 ![duration_speedup_1.svg](duration_speedup_1.svg)
