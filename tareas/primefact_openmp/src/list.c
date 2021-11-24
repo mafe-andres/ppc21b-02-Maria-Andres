@@ -74,9 +74,9 @@ void list_destroy(list_t *lista) {
  */
 int list_length(list_t *lista) {
     node_t *ptr;
-    int count = 1;
+    int count = 0;
     if (lista->cabeza == 0) {
-        count = 1;
+        count = -1;
     } else {
         ptr = lista->cabeza;
         while (ptr->next) {
@@ -87,47 +87,20 @@ int list_length(list_t *lista) {
     return count;
 }
 
-/**
- @brief Factorizes every number in the list.
-        Runs through list, if n is not factorizable stores -1. If n
-        is factorizable checks if it is prime or not, if prime stores itself
-        if not calculates list of prime numbers and corresponding exponents.
- @param list_t
- */
-void list_factorizar(list_t *l) {
-    node_t *ptr = l->cabeza;
-    if (l->cabeza != 0) {
-        while (ptr) {
-            int64_t num = ptr->num;
-            if (num > 1 && num < (pow(2, 63)-1)) {
-                for (int64_t j = 2; num > 1; j++) {
-                int64_t contador = 0;
-                    while (num%j == 0) {
-                        contador++;
-                        num /= j;
-                        if (num%j != 0) {
-                            if (contador > 1) {
-                                array_append(ptr->primos, j);
-                                array_append(ptr->potencias, contador);
-                            } else {
-                                array_append(ptr->primos, j);
-                                array_append(ptr->potencias, 1);
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (((num < 1) || (num == 1) || (num == 0)) && (num != -1)) {
-                    array_append(ptr->primos, -2);
-                    array_append(ptr->potencias, -2);
-                } else {
-                    array_append(ptr->primos, -1);
-                    array_append(ptr->potencias, -1);
-                }
-            }
+node_t* list_get_element(list_t *lista, int64_t num) {
+    node_t *ptr;
+    int64_t counter = 0;
+    int found = 0;
+    ptr = lista->cabeza;
+    while (ptr != NULL && found == 0) {
+        if (counter == num) {
+            found = 1;
+        } else {
             ptr = ptr->next;
+            counter++;
         }
     }
+    return ptr;
 }
 
 /**
