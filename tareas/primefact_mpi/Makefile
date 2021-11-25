@@ -1,3 +1,4 @@
 include ../common/Makefile
 
-DEFS=-fopenmp
+CC=mpicc
+XC=mpic++

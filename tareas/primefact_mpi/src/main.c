@@ -9,74 +9,173 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <omp.h>
+#include <mpi.h>
 #include "list.h"
 
 
-void* factorize_threads(void *data);
+void factorize(int process_number, int process_count, const char* process_hostname);
 int read_numbers(list_t *list);
-int create_threads(list_t *list, int64_t num_count, int64_t thread_count);
+//int create_threads(int process_number, int process_count, const char* process_hostname);
 
 /**
  @brief Reads amount of thread. Calls on readnumbers and create threads.
  @return EXIT_SUCCESS if succesfull, error code if error found
  */
 int main(int argc, char* argv[]) {
-  int error = EXIT_SUCCESS;
-  int64_t thread_count = sysconf(_SC_NPROCESSORS_ONLN);
-  if (argc == 2) {
-    if (sscanf(argv[1], "%" SCNu64, &thread_count) == 1) {
-    } else {
-      fprintf(stderr, "error: invalid thread count\n");
-      return EXIT_FAILURE;
-    }
-  }
-  list_t list;
-  list_init(&list);
-  read_numbers(&list);
-  if (read_numbers(&list) == EXIT_FAILURE) {
-    fprintf(stderr, "error: could not read file\n");
-    error = 10;
-  }
-  int64_t num_count = list_length(&list);
-  error = create_threads(&list, num_count, thread_count);
-  list_imprimir(&list);
-  return error;
-}
 
-/**
- @brief Reads numbers from file and adds the to list
- @param list_t
- @return EXIT_SUCCESS if numbers added succesfully, EXIT_FAILURE if error
- */
-int read_numbers(list_t *list) {
-  int error = EXIT_SUCCESS;
-  int64_t num;
-  int64_t last = -1;
-  char *prueba = malloc(100);
-  int final = 0;
-  while (scanf("%"SCNd64, &num) == 1 || (final = scanf("%s", prueba)) == 1) {
-    if (final == 1) {
-      list_insert_last(list, last);
-      final = 0;
-    } else {
-      list_insert_last(list, num);
+  if (MPI_Init(&argc, &argv) == MPI_SUCCESS) {
+    int error = EXIT_SUCCESS;
+    int process_number = -1;
+    MPI_Comm_rank(MPI_COMM_WORLD, &process_number);
+
+    int process_count = -1;
+    MPI_Comm_size(MPI_COMM_WORLD, &process_count);
+
+    char process_hostname[MPI_MAX_PROCESSOR_NAME] = { '\0' };
+    int hostname_length = -1;
+    MPI_Get_processor_name(process_hostname, &hostname_length);
+
+    try {
+      factorize(process_number, process_count, process_hostname);
+    } catch (const std::runtime_error& exception) {
+      std::cerr << "error: " << exception.what() << std::endl;
+      error = EXIT_FAILURE;
     }
-  }
-  free(prueba);
-  if (list_length(list) == -1) {
+
+    MPI_Finalize();
+  } else {
+    std::cerr << "error: could not init MPI" << std::endl;
     error = EXIT_FAILURE;
   }
+  // int error = EXIT_SUCCESS;
+  // int64_t thread_count = sysconf(_SC_NPROCESSORS_ONLN);
+  // if (argc == 2) {
+  //   if (sscanf(argv[1], "%" SCNu64, &thread_count) == 1) {
+  //   } else {
+  //     fprintf(stderr, "error: invalid thread count\n");
+  //     return EXIT_FAILURE;
+  //   }
+  // }
+  // list_t list;
+  // list_init(&list);
+  // read_numbers(&list);
+  // if (read_numbers(&list) == EXIT_FAILURE) {
+  //   fprintf(stderr, "error: could not read file\n");
+  //   error = 10;
+  // }
+  // int64_t num_count = list_length(&list);
+  // error = create_threads(&list, num_count, thread_count);
+  // list_imprimir(&list);
   return error;
 }
 
-int create_threads(list_t *list, int64_t num_count, int64_t thread_count) {
-  int error = EXIT_SUCCESS;
+void factorize(int process_number, int process_count, const char* process_hostname) {
 
-  #pragma omp parallel for num_threads(thread_count) schedule(runtime) \
-  default(none) shared(list, num_count)
-  for (int64_t i = 0; i <= num_count; i++) {
-    node_factorizar(list_get_element(list, i));
+int64_t *values;
+size_t value_count = 0;
+
+  if (process_number == 0){
+    size_t count = 0;
+    size_t capacity = 10;
+    values = malloc(10*sizeof(int64_t));
+
+    int64_t num;
+    int64_t last = -1;
+    char *prueba = malloc(100);
+    int final = 0;
+    while (scanf("%"SCNd64, &num) == 1 || (final = scanf("%s", prueba)) == 1) {
+      if (final == 1) {
+        values[count] = num;
+        final = 0;
+      } else {
+        values[count] = num;
+      }
+      if (count == capacity){
+        size_t new_capacity = capacity + 10;
+        int64_t *new_elements = (int64_t*);
+        realloc(values, new_capacity * sizeof(int64_t));
+        values = new_elements;
+        capacity = new_capacity;
+      }
+    }
+    free(prueba);
+    value_count = count;
+
+    for (int target = 1; target < process_count; ++target) {
+      static_assert(sizeof(value_count) == sizeof(uint64_t));
+      if (MPI_Send(&value_count, /*count*/ 1, MPI_UINT64_T, target
+        , /*tag*/ 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+        fail("could not send value count");
+      }
+      if (MPI_Send(&values[0], value_count, MPI_DOUBLE, target
+        , /*tag*/ 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+        fail("could not send values");
+      }
+    }
+  } else {
+    if (MPI_Recv(&value_count, /*capacity*/ 1, MPI_UINT64_T, /*source*/ 0
+      , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
+      fail("could not receive value count");
+    }
+
+    values.resize(value_count);
+
+    if (MPI_Recv(&values[0], /*capacity*/ value_count, MPI_DOUBLE, /*source*/ 0
+      , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
+      fail("could not receive values");
+    }
   }
-  return error;
+  for (size_t index = 0; index < values.size(); ++index) {
+    std::cout << process_hostname << ":" << process_number << ".m: values["
+      << index << "] == " << values[index] << std::endl;
+  }
+
+
 }
+
+// int calculate_start(int rank, int end, int workers, int begin) {
+//   const int range = end - begin;
+//   return begin + rank * (range / workers) + std::min(rank, range % workers);
+// }
+
+// int calculate_finish(int rank, int end, int workers, int begin) {
+//   return calculate_start(rank + 1, end, workers, begin);
+// }
+
+
+// /**
+//  @brief Reads numbers from file and adds the to list
+//  @param list_t
+//  @return EXIT_SUCCESS if numbers added succesfully, EXIT_FAILURE if error
+//  */
+// int read_numbers(list_t *list) {
+//   int error = EXIT_SUCCESS;
+//   int64_t num;
+//   int64_t last = -1;
+//   char *prueba = malloc(100);
+//   int final = 0;
+//   while (scanf("%"SCNd64, &num) == 1 || (final = scanf("%s", prueba)) == 1) {
+//     if (final == 1) {
+//       list_insert_last(list, last);
+//       final = 0;
+//     } else {
+//       list_insert_last(list, num);
+//     }
+//   }
+//   free(prueba);
+//   if (list_length(list) == -1) {
+//     error = EXIT_FAILURE;
+//   }
+//   return error;
+// }
+
+// int create_threads(list_t *list, int64_t num_count, int64_t thread_count) {
+//   int error = EXIT_SUCCESS;
+
+//   #pragma omp parallel for num_threads(thread_count) schedule(runtime) \
+//   default(none) shared(list, num_count)
+//   for (int64_t i = 0; i <= num_count; i++) {
+//     node_factorizar(list_get_element(list, i));
+//   }
+//   return error;
+// }
