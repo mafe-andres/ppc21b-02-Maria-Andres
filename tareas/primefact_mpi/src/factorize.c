@@ -10,13 +10,24 @@
 #include <math.h>
 #include "factorize.h"
 
+/**
+ @brief For every number between start and end call factorize.
+ @param values all numbers to factorize
+ @param start block start
+ @param end block end
+ @return void
+ */
 void call_factorize(int64_t *values, int start, int end) {
   for (int i = start; i <= end; i++) {
       factorize(values[i-1]);
-      //printf("%" PRId64 "\n", values[i-1]);
   }
 }
 
+/**
+ @brief If number is valid, iterate through odd numbers to find prime factors
+ @param num Number to factorize
+ @return void
+ */
 void factorize(int64_t num) {
     if (num > 1 && num < (pow(2, 63)-1)) {
         printf("%"PRId64": ", num);

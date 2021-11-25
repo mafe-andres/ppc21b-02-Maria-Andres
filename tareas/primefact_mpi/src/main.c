@@ -20,8 +20,8 @@ void swap(int *a, int *b);
 int calculate(int process_number, int process_count, size_t value_count);
 
 /**
- @brief Reads amount of thread. Calls on readnumbers and create threads.
- @return EXIT_SUCCESS if succesfull, error code if error found
+ @brief Initializes MPI, initializes processes
+ @return EXIT_SUCCESS if succesfull, EXIT_FAILURE if error found
  */
 int main(int argc, char* argv[]) {
   int error = EXIT_SUCCESS;
@@ -42,12 +42,20 @@ int main(int argc, char* argv[]) {
   return error;
 }
 
+/**
+ @brief If process 0 reads numbers, sends to other processes. Other processes
+ recieve values. Calls block mapping and calls factorize.
+ @param process_count overall number of proccesses
+ @param process_number current number of proccessses 
+ @return void
+ */
 void init_processes(int process_number, int process_count) {
   int64_t *values;
   size_t value_count = 0;
   int start;
   int end;
 
+  // if process 0
   if (process_number == 0) {
     size_t count = 0;
     size_t capacity = 10;
@@ -90,12 +98,14 @@ void init_processes(int process_number, int process_count) {
       processes[target-1] = target;
     }
 
-    srand(time(0));
+    // randomizes processes for pseudo dynamic mapping
+    srand(time(NULL));
     for (int i = process_count-2; i > 0; i--) {
-        int j = rand() % (i+1);
+        int j = rand() % (i+/1);
         swap(&processes[i], &processes[j]);
     }
 
+    // block mapping
     for (int i = 0; i < (process_count-1); i++) {
       int start = calculate(i, (process_count-1), value_count);
       if (MPI_Send(&start, /*count*/ 1, MPI_INTEGER, processes[i]
@@ -109,6 +119,7 @@ void init_processes(int process_number, int process_count) {
       }
     }
 
+  // if other process
   } else {
     if (MPI_Recv(&value_count, /*capacity*/ 1, MPI_UINT64_T, /*source*/ 0
       , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
@@ -131,12 +142,20 @@ void init_processes(int process_number, int process_count) {
   }
 }
 
+/**
+ @brief Swaps two ints
+ @return void
+ */
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
+/**
+ @brief Calculates start number using total numbers.
+ @return int Start point
+ */
 int calculate(int process_number, int process_count, size_t value_count) {
     int numperblock = round((double)value_count/process_count);
     int from = process_number*numperblock;

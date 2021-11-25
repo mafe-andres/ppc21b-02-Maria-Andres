@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
 /**
  @brief Reads numbers from file and adds the to list
- @param list_t
+ @param list_t list that numbers will be added to
  @return EXIT_SUCCESS if numbers added succesfully, EXIT_FAILURE if error
  */
 int read_numbers(list_t *list) {
@@ -70,6 +70,13 @@ int read_numbers(list_t *list) {
   return error;
 }
 
+/**
+ @brief Creates threads using OMP. Calls factorize for every number on list.
+ @param list_t 
+ @para num_count amount of numbers
+ @param thread_count number of threads available
+ @return EXIT_SUCCESS
+ */
 int create_threads(list_t *list, int64_t num_count, int64_t thread_count) {
   int error = EXIT_SUCCESS;
 
