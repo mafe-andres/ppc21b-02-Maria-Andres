@@ -14,7 +14,6 @@
 
 
 void factorize(int process_number, int process_count, const char* process_hostname);
-int read_numbers(list_t *list);
 //int create_threads(int process_number, int process_count, const char* process_hostname);
 
 /**
@@ -22,9 +21,8 @@ int read_numbers(list_t *list);
  @return EXIT_SUCCESS if succesfull, error code if error found
  */
 int main(int argc, char* argv[]) {
-
+  int error = EXIT_SUCCESS;
   if (MPI_Init(&argc, &argv) == MPI_SUCCESS) {
-    int error = EXIT_SUCCESS;
     int process_number = -1;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_number);
 
@@ -35,16 +33,11 @@ int main(int argc, char* argv[]) {
     int hostname_length = -1;
     MPI_Get_processor_name(process_hostname, &hostname_length);
 
-    try {
-      factorize(process_number, process_count, process_hostname);
-    } catch (const std::runtime_error& exception) {
-      std::cerr << "error: " << exception.what() << std::endl;
-      error = EXIT_FAILURE;
-    }
+    factorize(process_number, process_count, process_hostname);
 
     MPI_Finalize();
   } else {
-    std::cerr << "error: could not init MPI" << std::endl;
+    printf("error: could not init MPI");
     error = EXIT_FAILURE;
   }
   // int error = EXIT_SUCCESS;
@@ -73,61 +66,58 @@ void factorize(int process_number, int process_count, const char* process_hostna
 
 int64_t *values;
 size_t value_count = 0;
-
   if (process_number == 0){
     size_t count = 0;
     size_t capacity = 10;
     values = malloc(10*sizeof(int64_t));
 
     int64_t num;
-    int64_t last = -1;
     char *prueba = malloc(100);
     int final = 0;
     while (scanf("%"SCNd64, &num) == 1 || (final = scanf("%s", prueba)) == 1) {
       if (final == 1) {
         values[count] = num;
+        count++;
         final = 0;
       } else {
         values[count] = num;
+        count++;
       }
       if (count == capacity){
         size_t new_capacity = capacity + 10;
-        int64_t *new_elements = (int64_t*);
-        realloc(values, new_capacity * sizeof(int64_t));
+        int64_t *new_elements = (int64_t*) realloc(values, new_capacity * sizeof(int64_t));
         values = new_elements;
         capacity = new_capacity;
       }
     }
     free(prueba);
     value_count = count;
-
     for (int target = 1; target < process_count; ++target) {
-      static_assert(sizeof(value_count) == sizeof(uint64_t));
+      assert(sizeof(value_count) == sizeof(uint64_t));
       if (MPI_Send(&value_count, /*count*/ 1, MPI_UINT64_T, target
         , /*tag*/ 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-        fail("could not send value count");
+        printf("could not send value count");
       }
       if (MPI_Send(&values[0], value_count, MPI_DOUBLE, target
         , /*tag*/ 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-        fail("could not send values");
+        printf("could not send values");
       }
     }
   } else {
     if (MPI_Recv(&value_count, /*capacity*/ 1, MPI_UINT64_T, /*source*/ 0
       , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
-      fail("could not receive value count");
+      printf("could not receive value count");
     }
-
-    values.resize(value_count);
-
+    values = malloc(value_count*sizeof(int64_t));
     if (MPI_Recv(&values[0], /*capacity*/ value_count, MPI_DOUBLE, /*source*/ 0
       , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
-      fail("could not receive values");
+      printf("could not receive values");
     }
   }
-  for (size_t index = 0; index < values.size(); ++index) {
-    std::cout << process_hostname << ":" << process_number << ".m: values["
-      << index << "] == " << values[index] << std::endl;
+
+  for (size_t index = 0; index < value_count; ++index) {
+    printf(process_hostname);
+    printf(": %d .m: values[%d] == %d\n", process_number,(int)index,(int)values[index]);
   }
 
 
@@ -172,7 +162,7 @@ size_t value_count = 0;
 // int create_threads(list_t *list, int64_t num_count, int64_t thread_count) {
 //   int error = EXIT_SUCCESS;
 
-//   #pragma omp parallel for num_threads(thread_count) schedule(runtime) \
+//   #pragma omp parallel for num_threads(thread_count) schedule(runtime)
 //   default(none) shared(list, num_count)
 //   for (int64_t i = 0; i <= num_count; i++) {
 //     node_factorizar(list_get_element(list, i));
