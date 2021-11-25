@@ -1,6 +1,7 @@
 /*
  * Copyright [2021] Maria Andres
  */
+
 #include <assert.h>
 #include <inttypes.h>
 #include <pthread.h>
@@ -15,10 +16,9 @@
 #include <factorize.h>
 
 
-void init_processes(int process_number, int process_count, const char* process_hostname);
+void init_processes(int process_number, int process_count);
 void swap(int *a, int *b);
 int calculate(int process_number, int process_count, size_t value_count);
-//int create_threads(int process_number, int process_count, const char* process_hostname);
 
 /**
  @brief Reads amount of thread. Calls on readnumbers and create threads.
@@ -33,10 +33,6 @@ int main(int argc, char* argv[]) {
     int process_count = -1;
     MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 
-    char process_hostname[MPI_MAX_PROCESSOR_NAME] = { '\0' };
-    int hostname_length = -1;
-    MPI_Get_processor_name(process_hostname, &hostname_length);
-
     init_processes(process_number, process_count, process_hostname);
 
     MPI_Finalize();
@@ -47,13 +43,13 @@ int main(int argc, char* argv[]) {
   return error;
 }
 
-void init_processes(int process_number, int process_count, const char* process_hostname) {
+void init_processes(int process_number, int process_count) {
   int64_t *values;
   size_t value_count = 0;
   int start;
   int end;
 
-  if (process_number == 0){
+  if (process_number == 0) {
     size_t count = 0;
     size_t capacity = 10;
     values = malloc(10*sizeof(int64_t));
@@ -70,9 +66,10 @@ void init_processes(int process_number, int process_count, const char* process_h
         values[count] = num;
         count++;
       }
-      if (count == capacity){
+      if (count == capacity) {
         size_t new_capacity = capacity + 10;
-        int64_t *new_elements = (int64_t*) realloc(values, new_capacity * sizeof(int64_t));
+        int64_t *new_elements = (int64_t*) \
+        realloc(values, new_capacity * sizeof(int64_t));
         values = new_elements;
         capacity = new_capacity;
       }
@@ -93,14 +90,13 @@ void init_processes(int process_number, int process_count, const char* process_h
       }
       processes[target-1] = target;
     }
-    
     srand(time(NULL));
-    for(int i = process_count-2; i > 0; i--) {
-        int j = rand() % (i+1);
+    for (int i = process_count-2; i > 0; i--) {
+        int j = rand() % (i+/1);
         swap(&processes[i], &processes[j]);
     }
 
-    for (int i = 0; i < (process_count-1); i++){
+    for (int i = 0; i < (process_count-1); i++) {
       int start = calculate(i, (process_count-1), value_count);
       if (MPI_Send(&start, /*count*/ 1, MPI_INTEGER, processes[i]
       , /*tag*/ 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
@@ -112,7 +108,6 @@ void init_processes(int process_number, int process_count, const char* process_h
       printf("could not send end value");
       }
     }
-
   } else {
     if (MPI_Recv(&value_count, /*capacity*/ 1, MPI_UINT64_T, /*source*/ 0
       , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
@@ -134,13 +129,6 @@ void init_processes(int process_number, int process_count, const char* process_h
 
     call_factorize(values, start, end);
   }
-
-  // for (size_t index = 0; index < value_count; ++index) {
-  //   printf(process_hostname);
-  //   printf(": %d . start: %d. end: %d\n", process_number,start, end);
-  // }
-
-
 }
 
 void swap(int *a, int *b) {

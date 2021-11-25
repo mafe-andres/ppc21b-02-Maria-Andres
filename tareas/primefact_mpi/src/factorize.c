@@ -1,3 +1,7 @@
+/*
+ * Copyright [2021] Maria Andres
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,7 +10,7 @@
 #include "factorize.h"
 
 void call_factorize(int64_t *values, int start, int end) {
-  for(int i = start; i < end; i++){
+  for (int i = start; i < end; i++) {
       factorize(values[i-1]);
   }
 }
@@ -22,9 +26,9 @@ void factorize(int64_t num) {
                 num /= base;
                 if ((num%base) != 0) {
                     if (contador > 1) {
-                        printf("%d^%d ",base,contador);
+                        printf("%d^%d ", base, contador);
                     } else if (num >= 1) {
-                        printf("%d ",base);
+                        printf("%d ", base);
                     }
                 }
             }
@@ -35,9 +39,9 @@ void factorize(int64_t num) {
             } while (num >1);
         printf("\n");
     } else {
-        if (num == 0 || num == 1){
+        if (num == 0 || num == 1) {
             printf("%d: NA\n", (int)num);
-        } else if (num < 0){
+        } else if (num < 0) {
             printf("%d: invalid number\n", (int)num);
         } else {
             printf("invalid number\n");
