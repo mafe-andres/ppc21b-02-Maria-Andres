@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     int process_count = -1;
     MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 
-    init_processes(process_number, process_count, process_hostname);
+    init_processes(process_number, process_count);
 
     MPI_Finalize();
   } else {
@@ -90,9 +90,9 @@ void init_processes(int process_number, int process_count) {
       processes[target-1] = target;
     }
 
-    srand(time(NULL));
+    srand(time(0));
     for (int i = process_count-2; i > 0; i--) {
-        int j = rand() % (i+/1);
+        int j = rand() % (i+1);
         swap(&processes[i], &processes[j]);
     }
 
