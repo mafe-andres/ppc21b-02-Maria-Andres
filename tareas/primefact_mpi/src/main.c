@@ -9,11 +9,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include <unistd.h>
 #include <time.h>
 #include <math.h>
 #include <mpi.h>
-#include <factorize.h>
+#include "factorize.h"
 
 
 void init_processes(int process_number, int process_count);
@@ -76,8 +75,8 @@ void init_processes(int process_number, int process_count) {
     }
     free(prueba);
     value_count = count;
-    int *processes = malloc((process_count-1)*sizeof(int));
 
+    int *processes = malloc((process_count-1)*sizeof(int));
     for (int target = 1; target < process_count; ++target) {
       assert(sizeof(value_count) == sizeof(uint64_t));
       if (MPI_Send(&value_count, /*count*/ 1, MPI_UINT64_T, target
@@ -90,6 +89,7 @@ void init_processes(int process_number, int process_count) {
       }
       processes[target-1] = target;
     }
+
     srand(time(NULL));
     for (int i = process_count-2; i > 0; i--) {
         int j = rand() % (i+/1);
@@ -108,6 +108,7 @@ void init_processes(int process_number, int process_count) {
       printf("could not send end value");
       }
     }
+
   } else {
     if (MPI_Recv(&value_count, /*capacity*/ 1, MPI_UINT64_T, /*source*/ 0
       , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
@@ -126,7 +127,6 @@ void init_processes(int process_number, int process_count) {
       , /*tag*/ 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS ) {
       printf("could not receive end value");
     }
-
     call_factorize(values, start, end);
   }
 }
